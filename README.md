@@ -1,6 +1,6 @@
-# Project Title
+# Intro to Image Processing with Python
 
-A brief description of what this project does and who it's for.
+Introductory course for Image Processing with Python, given to students and post-docs at the Stowers Institue for Medical Research.
 
 ## Installation 
 
