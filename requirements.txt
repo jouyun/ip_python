@@ -1,0 +1,11 @@
+numpy
+pandas
+napari
+tifffile
+scikit-image
+scipy
+glob2
+plotly
+cellpose
+matplotlib
+stackview
