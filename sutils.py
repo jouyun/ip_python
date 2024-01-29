@@ -37,6 +37,43 @@ def backsub_2D(inp, radius=60):
     rtn = np.clip(rtn, 0, np.inf)
     return rtn
 
+def backsub(inp, radius=60):
+    """
+    Performs background subtraction on an input image or a stack of images.
+
+    Parameters:
+    inp (numpy.ndarray): Input image or stack of images. If 2D, it's treated as a single image. If nD, it's treated as a stack of images.
+    radius (int, optional): Radius for the background subtraction. Default is 60.
+
+    Returns:
+    numpy.ndarray: Image or stack of images with the background subtracted.
+    """
+
+    # If the input is 2D, it's a single image. Perform background subtraction directly.
+    if len(inp.shape) <= 2:
+        return backsub_2D(inp, radius)
+
+    # If the input is nD, it's a stack of images. We need to process each image separately.
+    # First, we reshape the stack to a 2D array where each row is an image.
+    orig_shape = inp.shape
+    img = np.reshape(inp, (-1, orig_shape[-2], orig_shape[-1]))
+
+    # We use Dask to perform the background subtraction in parallel for each image.
+    # This is done by creating a list of delayed computations, one for each image.
+    process = [dask.delayed(backsub_2D)(i,radius) for i in img]
+
+    # We then compute all the delayed computations in parallel.
+    rslt = dask.compute(*process)
+
+    # The result is a list of images. We convert it to a numpy array.
+    rslt = np.array(rslt)
+
+    # Finally, we reshape the result back to the original shape of the input.
+    rslt = np.reshape(rslt, orig_shape)
+
+    return rslt
+
+
 def remove_objects(label_image, area_min, area_max):
     """
     This function removes objects from a labeled image based on their area.
